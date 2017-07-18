@@ -144,8 +144,16 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
 
     if( role == EventTypeRole )
     {
-        if( event->type() == QMatrixClient::EventType::RoomMessage )
-            return "message";
+        if( event->type() == QMatrixClient::EventType::RoomMessage ) {
+            QMatrixClient::RoomMessageEvent* re = static_cast<QMatrixClient::RoomMessageEvent*>(event);
+            if (re->msgtype() == QMatrixClient::RoomMessageEvent::MsgType::Emote) {
+                return "message.emote";
+            } else if (re->msgtype() == QMatrixClient::RoomMessageEvent::MsgType::Notice) {
+                return "message.notice";
+            } else {
+                return "message";
+            }
+        }
         return "other";
     }
 

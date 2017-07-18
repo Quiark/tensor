@@ -35,6 +35,7 @@ Rectangle {
         scrollBar.position = Math.max(0, Math.min(1 - scrollBar.size, scrollBar.position + amount * scrollBar.stepSize));
     }
 
+
     ListView {
         id: chatView
         anchors.fill: parent
@@ -58,9 +59,17 @@ Rectangle {
                 id: authorlabel
                 width: 140
                 elide: Text.ElideRight
-                text: eventType == "message" ? author : "***"
+                text: {
+                    if (eventType.startsWith("message")) {
+                        if (eventType == "message.emote")
+                            return "* " + author;
+                        else
+                            return author;
+                    } else return "***"
+                }
                 font.family: Theme.nickFont
-                color: eventType == "message" ? JsChat.NickColoring.get(author): "lightgrey"
+                font.italic: eventType == "message.emote" ? true : false
+                color: eventType.startsWith("message") ? JsChat.NickColoring.get(author): "lightgrey"
                 horizontalAlignment: Text.AlignRight
             }
             Label {
@@ -68,11 +77,12 @@ Rectangle {
                 text: content
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventType == "message" ? "black" : "lightgrey"
+                color: eventType.startsWith("message") ? "black" : "lightgrey"
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont
                 font.pointSize: Theme.textSize
+                font.italic: eventType == "message.emote" ? true : false
                 onLinkActivated: Qt.openUrlExternally(link)
             }
         }

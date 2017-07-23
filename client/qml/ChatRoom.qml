@@ -77,7 +77,7 @@ Rectangle {
                 text: content
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventType.startsWith("message") ? "black" : "lightgrey"
+                color: eventType.startsWith("message") ? Theme.chatFg : "lightgrey"
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont

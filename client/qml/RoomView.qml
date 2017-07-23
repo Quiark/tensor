@@ -79,6 +79,11 @@ Item {
         focus: true
         style: TextFieldStyle {
             font: Theme.textFont
+            textColor: Theme.textInputFg
+            background: Rectangle {
+                border.width: 0
+                color: Theme.roomListBg
+            }
         }
 
         placeholderText: qsTr("Say something...")

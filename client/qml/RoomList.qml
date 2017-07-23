@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
+import QtQuick.Controls.Styles 1.4
 import Matrix 1.0
 import Tensor 1.0
 import 'jschat.js' as JsChat
@@ -126,6 +127,15 @@ Rectangle {
             width: parent.width
             placeholderText: qsTr("Join room...")
             onAccepted: { joinRoom(text); text = "" }
+
+            style: TextFieldStyle {
+                font: Theme.textFont
+                textColor: Theme.textInputFg
+                background: Rectangle {
+                    border.width: 0
+                    color: Theme.roomListBg
+                }
+            }
         }
     }
 }

@@ -81,6 +81,11 @@ Rectangle {
         SplitView {
             anchors.fill: parent
 
+            handleDelegate: Rectangle {
+                color: red
+                border.width: 0
+            }
+
             RoomList {
                 id: roomListItem
                 width: parent.width / 5

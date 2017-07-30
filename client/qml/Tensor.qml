@@ -41,7 +41,6 @@ Rectangle {
     function login(user, pass, connect) {
         if(!connect) connect = connection.connectToServer
 
-        // TODO: apparently reconnect is done with password but only a token is available so it won't reconnect
         connection.connected.connect(function() {
             settings.user = connection.userId()
             settings.token = connection.token()
@@ -56,6 +55,10 @@ Rectangle {
             connection.reconnected.connect(resync)
 
             connection.sync()
+        })
+
+        connection.loginError.connect(function() {
+            login.restore("Login invalid")
         })
 
         var userParts = user.split(':')
@@ -82,7 +85,6 @@ Rectangle {
             anchors.fill: parent
 
             handleDelegate: Rectangle {
-                color: red
                 border.width: 0
             }
 

@@ -14,6 +14,14 @@ Item {
         passwordField.opacity = 0
     }
 
+    function restore(msg) {
+        userNameField.enabled = true
+        passwordField.enabled = true
+        userNameField.opacity = 1
+        passwordField.opacity = 1
+        label.text = qsTr(msg)
+    }
+
     Column {
         width: parent.width / 2
         anchors.centerIn: parent

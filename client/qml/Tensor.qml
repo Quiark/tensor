@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import Qt.labs.settings 1.0
+import Qt.labs.platform 1.0
 import Matrix 1.0
 import Tensor 1.0
 
@@ -12,8 +13,13 @@ Rectangle {
     color: "#eee"
 
     property bool initialised: false
+    property int syncIx: 0
+    signal componentsComplete();
 
-    Connection { id: connection }
+    Connection {
+        id: connection
+        stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json").substring("file://".length)
+    }
     Settings   {
         id: settings
 
@@ -25,13 +31,18 @@ Rectangle {
     }
 
     function resync() {
-        if(!initialised) {
+        if (!initialised) {
+            roomListItem.init()
+
             login.visible = false
             mainView.visible = true
-            roomListItem.init()
             initialised = true
         }
+        syncIx += 1
         connection.sync(30000)
+
+        // every now and then but not on the first sync
+        if ((syncIx % 30) == 2) connection.saveState()
     }
 
     function reconnect() {
@@ -54,7 +65,10 @@ Rectangle {
             connection.syncDone.connect(function() { roomView.displayStatus("synced") })
             connection.reconnected.connect(resync)
 
-            connection.sync()
+            componentsComplete.connect(function() {
+                connection.loadState()
+                connection.sync()
+            })
         })
 
         connection.loginError.connect(function() {
@@ -98,6 +112,7 @@ Rectangle {
                     enterRoom.connect(roomView.setRoom)
                     joinRoom.connect(connection.joinRoom)
                     leaveRoom.connect(connection.leaveRoom)
+                    componentsComplete();
                 }
             }
 

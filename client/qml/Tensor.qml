@@ -18,7 +18,7 @@ Rectangle {
 
     Connection {
         id: connection
-        stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json").substring("file://".length)
+        stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json")
     }
     Settings   {
         id: settings

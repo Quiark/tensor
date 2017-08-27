@@ -18,7 +18,7 @@ Rectangle {
 
     Connection {
         id: connection
-        stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json")
+        property string stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json")
     }
     Settings   {
         id: settings
@@ -42,7 +42,7 @@ Rectangle {
         connection.sync(30000)
 
         // every now and then but not on the first sync
-        if ((syncIx % 30) == 2) connection.saveState()
+        if ((syncIx % 30) == 2) connection.saveState(connection.stateSaveFile)
     }
 
     function reconnect() {
@@ -66,7 +66,7 @@ Rectangle {
             connection.reconnected.connect(resync)
 
             componentsComplete.connect(function() {
-                connection.loadState()
+                connection.loadState(connection.stateSaveFile)
                 connection.sync()
             })
         })

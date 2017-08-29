@@ -14,6 +14,7 @@ Rectangle {
 
     property bool initialised: false
     property int syncIx: 0
+    property var lastSync
     signal componentsComplete();
 
     Connection {
@@ -39,6 +40,14 @@ Rectangle {
             initialised = true
         }
         syncIx += 1
+
+        // timing
+        var now = new Date()
+        var delay = (now - lastSync) / 1000
+        console.log("..> synced in ", delay, " s <..")
+        roomView.displayStatus("synced (in "+ delay +"s)")
+        lastSync = now
+
         connection.sync(30000)
 
         // every now and then but not on the first sync
@@ -62,7 +71,6 @@ Rectangle {
             connection.resolveError.connect(reconnect)
             connection.resolveError.connect(function() { roomView.displayStatus("resolve error")})
             connection.syncDone.connect(resync)
-            connection.syncDone.connect(function() { roomView.displayStatus("synced") })
             connection.reconnected.connect(resync)
 
             componentsComplete.connect(function() {

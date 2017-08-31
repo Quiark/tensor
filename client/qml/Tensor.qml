@@ -17,6 +17,14 @@ Rectangle {
     property var lastSync
     signal componentsComplete();
 
+    Timer {
+        id: synctimer
+        repeat: false
+        onTriggered: {
+            connection.sync(30000)
+        }
+    }
+
     Connection {
         id: connection
         property string stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json")
@@ -29,6 +37,8 @@ Rectangle {
 
         property alias winWidth: window.width
         property alias winHeight: window.height
+
+        property int minResyncMs: 4000
     }
 
     function resync() {
@@ -44,11 +54,16 @@ Rectangle {
         // timing
         var now = new Date()
         var delay = (now - lastSync) / 1000
-        console.log("..> synced in ", delay, " s <..")
+        //console.log("..> synced in ", delay, " s <..")
         roomView.displayStatus("synced (in "+ delay +"s)")
-        lastSync = now
+        synctimer.interval = settings.minResyncMs - (delay * 1000)
+        if (!(synctimer.interval > 0)) { // this expression also takes care of NaN
+            synctimer.interval = 0
+        }
+        //console.log("resync in .. ", synctimer.interval, " ms")
 
-        connection.sync(30000)
+        synctimer.start()
+        lastSync = now
 
         // every now and then but not on the first sync
         if ((syncIx % 30) == 2) connection.saveState(connection.stateSaveFile)

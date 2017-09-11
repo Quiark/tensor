@@ -4,6 +4,7 @@ import QtQuick.Controls 1.0
 Item {
     //color: "#eee"
     property variant window
+    id: thisLogin
 
     function login(pretend) {
         label.text = qsTr("Please wait...")
@@ -19,7 +20,14 @@ Item {
         passwordField.enabled = true
         userNameField.opacity = 1
         passwordField.opacity = 1
+        logoAnimation.start()
+        thisLogin.visible = true
         label.text = qsTr(msg)
+    }
+
+    function hide() {
+        logoAnimation.stop()
+        thisLogin.visible = false
     }
 
     Column {
@@ -44,6 +52,7 @@ Item {
                 source: "qrc:/logo.png"
 
                 RotationAnimation on rotation {
+                    id: logoAnimation
                     loops: Animation.Infinite
                     from: 0
                     to: 360

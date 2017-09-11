@@ -45,7 +45,7 @@ Rectangle {
         if (!initialised) {
             roomListItem.init()
 
-            login.visible = false
+            login.hide()
             mainView.visible = true
             initialised = true
         }

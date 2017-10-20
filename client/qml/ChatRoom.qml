@@ -27,7 +27,7 @@ Rectangle {
 
     function sendLine(text) {
         if (!currentRoom || !currentConnection) return
-        if (text.trimmed().length() === 0) return
+        if (text.trim().length === 0) return
         currentConnection.postMessage(currentRoom, "m.text", text)
         chatView.positionViewAtBeginning()
     }

@@ -43,6 +43,7 @@ void RoomListModel::setConnection(QMatrixClient::Connection* connection)
     m_connection = connection;
     m_rooms.clear();
     connect( connection, &QMatrixClient::Connection::newRoom, this, &RoomListModel::addRoom );
+    connect( connection, &QMatrixClient::Connection::leftRoom, this, &RoomListModel::removeRoom );
     for( QMatrixClient::Room* room: connection->roomMap().values() ) {
         connect( room, &QMatrixClient::Room::namesChanged, this, &RoomListModel::namesChanged );
         m_rooms.append(room);
@@ -53,6 +54,15 @@ void RoomListModel::setConnection(QMatrixClient::Connection* connection)
 QMatrixClient::Room* RoomListModel::roomAt(int row)
 {
     return m_rooms.at(row);
+}
+
+void RoomListModel::removeRoom(QMatrixClient::Room* room)
+{
+    int ix = m_rooms.indexOf(room);
+    if (ix == -1) return;
+
+    beginRemoveRows(QModelIndex(), ix, ix);
+    endRemoveRows();
 }
 
 void RoomListModel::addRoom(QMatrixClient::Room* room)

@@ -34,9 +34,12 @@ Rectangle {
         initialised = true
         var found = false
         for (var i = 0; i < rooms.rowCount(); i++) {
-            if (rooms.roomAt(i).canonicalAlias === defaultRoom) {
+            var r = rooms.roomAt(i)
+            if (r === null) continue
+
+            if (r.canonicalAlias === defaultRoom) {
                 roomListView.currentIndex = i
-                enterRoom(rooms.roomAt(i))
+                enterRoom(r)
                 found = true
             }
         }
@@ -117,7 +120,11 @@ Rectangle {
                 id: contextMenu
                 MenuItem {
                     text: qsTr("Leave")
-                    onTriggered: leaveRoom(currentRoom())
+                    onTriggered: {
+                        var roomToLeave = currentRoom()
+                        changeRoom(+1)
+                        leaveRoom(roomToLeave)
+                    }
                 }
             }
         }

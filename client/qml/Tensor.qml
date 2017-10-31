@@ -15,6 +15,7 @@ Rectangle {
     property bool initialised: false
     property int syncIx: 0
     property var lastSync
+    property bool roomListComplete: false
     signal componentsComplete();
 
     Timer {
@@ -39,6 +40,7 @@ Rectangle {
         property alias winHeight: window.height
 
         property int minResyncMs: 4000
+        property string deviceId: ""
     }
 
     function resync() {
@@ -70,15 +72,17 @@ Rectangle {
     }
 
     function reconnect() {
-        connection.connectWithToken(connection.userId(), connection.token())
+        connection.connectWithToken(connection.userId(), connection.token(), connection.deviceId())
     }
 
-    function login(user, pass, connect) {
-        if(!connect) connect = connection.connectToServer
+    function login(user, pass, connectFn) {
+        if (!connectFn) connectFn = connection.connectToServer
 
         connection.connected.connect(function() {
             settings.user = connection.userId()
             settings.token = connection.token()
+            var deviceId = connection.deviceId()
+            if (deviceId !== undefined) settings.deviceId = deviceId
             roomView.displayStatus("connected")
 
             connection.syncError.connect(reconnect)
@@ -88,10 +92,12 @@ Rectangle {
             connection.syncDone.connect(resync)
             connection.reconnected.connect(resync)
 
-            componentsComplete.connect(function() {
+            var startSyncFn = function() {
                 connection.loadState(connection.stateSaveFile)
                 connection.sync()
-            })
+            }
+            if (roomListComplete) startSyncFn()
+            else componentsComplete.connect(startSyncFn)
         })
 
         connection.loginError.connect(function() {
@@ -100,10 +106,10 @@ Rectangle {
 
         var userParts = user.split(':')
         if(userParts.length === 1 || userParts[1] === "matrix.org") {
-            connect(user, pass)
+            connectFn(user, pass, settings.deviceId)
         } else {
             connection.resolved.connect(function() {
-                connect(user, pass)
+                connectFn(user, pass, settings.deviceId)
             })
             connection.resolveError.connect(function() {
                 console.log("Couldn't resolve server!")
@@ -131,10 +137,12 @@ Rectangle {
                 height: parent.height
 
                 Component.onCompleted: {
+                    // TODO if token not available, this will execute before its attached signal
                     setConnection(connection)
                     enterRoom.connect(roomView.setRoom)
                     joinRoom.connect(connection.joinRoom)
                     leaveRoom.connect(connection.leaveRoom)
+                    roomListComplete = true
                     componentsComplete();
                 }
             }
@@ -158,7 +166,7 @@ Rectangle {
         Component.onCompleted: {
             var user = settings.user
             var token = settings.token
-            if(user && token) {
+            if (user && token) {
                 login.login(true)
                 window.login(user, token, connection.connectWithToken)
             }

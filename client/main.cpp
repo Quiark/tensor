@@ -7,7 +7,7 @@
 #include "user.h"
 #include "jobs/syncjob.h"
 #include "jobs/joinroomjob.h"
-#include "jobs/leaveroomjob.h"
+#include "jobs/generated/inviting.h"
 #include "models/messageeventmodel.h"
 #include "models/roomlistmodel.h"
 #include "settings.h"

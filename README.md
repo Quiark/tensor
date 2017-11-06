@@ -1,22 +1,19 @@
 # Tensor
-Tensor is an IM client for the [Matrix](https://matrix.org) protocol in development. [![Build Status](https://travis-ci.org/davidar/tensor.svg?branch=master)](https://travis-ci.org/davidar/tensor)
+The buttonless client for the [Matrix](https://matrix.org) chat protocol.
 
 ![](client/logo.png)
 
 ## Pre-requisites
-- a Linux or Windows system (MacOS should work too)
-- a Git client (to check out this repo)
+- an OS (Windows, Linux, macOS and others)
 - a C++ toolchain that can deal with Qt (see a link for your platform at http://doc.qt.io/qt-5/gettingstarted.html#platform-requirements)
-- CMake (from your package management system or https://cmake.org/download/)
 - Qt 5 (either Open Source or Commercial)
-- KDE Framework Core Addons (optional; a submodule from KDE git is included in this repo and will be used if CMake doesn't find a KCoreAddons package)
 
 ## Linux
 
 ![Screenshot](screen/kde4.png)
 
 ### Installing pre-requisites
-Just install things from "Pre-requisites" using your preferred package manager. If your Qt package base is fine-grained you might want to take a look at CMakeLists.txt to figure out which specific libraries Tensor uses.
+Just install things from "Pre-requisites" using your preferred package manager. If your Qt package base is fine-grained you might want to take a look at tensor.pro to figure out which specific libraries Tensor uses.
 
 ### Building
 From the root directory of the project sources, first update submodules:
@@ -88,15 +85,8 @@ Actions:
   - Alternatively: just build Tensor inside the same kdeenv wrapper shell (not tried but should work).
 
 ### Building
-All operations below assume that mingw32-make (if you use the MinGW toolchain) and cmake are in your PATH. If you use an IDE, import the sources as a CMake project and the IDE should do the rest for you. Qt Creator (the stock Qt IDE) and CLion were checked to work. The source tree also contains a (no more maintained) .project file for CodeLite.
 
-From the root directory of the project sources:
-```
-md build
-cd build
-cmake ../
-mingw32-make
-```
+Build using QtCreator or try to use qmake.
 
 ### Installation
 There is no installer configuration for Windows as of yet. You might want to use [the Windows Deployment Tool](http://doc.qt.io/qt-5/windows-deployment.html#the-windows-deployment-tool) that comes with Qt to find all dependencies and put them into the build directory. Though it misses on a library or two it helps a lot. To double-check that you're good to go you can use [the Dependencies Walker tool aka depends.exe](http://www.dependencywalker.com/) - this is especially needed when you have a mixed 32/64-bit environment or have different versions of the same library scattered around.

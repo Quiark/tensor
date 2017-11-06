@@ -28,8 +28,7 @@
 #include "lib/events/event.h"
 #include "lib/events/roommessageevent.h"
 #include "lib/events/roommemberevent.h"
-#include "lib/events/roomaliasesevent.h"
-#include "lib/events/unknownevent.h"
+#include "lib/events/simplestateevents.h"
 
 MessageEventModel::MessageEventModel(QObject* parent)
     : QAbstractListModel(parent)

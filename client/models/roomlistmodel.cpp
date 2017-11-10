@@ -62,6 +62,7 @@ void RoomListModel::removeRoom(QMatrixClient::Room* room)
     if (ix == -1) return;
 
     beginRemoveRows(QModelIndex(), ix, ix);
+    m_rooms.removeAt(ix);
     endRemoveRows();
 }
 

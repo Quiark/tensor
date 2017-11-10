@@ -28,7 +28,14 @@ Rectangle {
     function sendLine(text) {
         if (!currentRoom || !currentConnection) return
         if (text.trim().length === 0) return
-        currentConnection.postMessage(currentRoom, "m.text", text)
+
+        var type = "m.text"
+        var PREFIX_ME = '/me '
+        if (text.startsWith(PREFIX_ME)) {
+            text = text.substr(PREFIX_ME.length)
+            type = "m.emote"
+        }
+        currentConnection.postMessage(currentRoom, type, text)
         chatView.positionViewAtBeginning()
     }
 

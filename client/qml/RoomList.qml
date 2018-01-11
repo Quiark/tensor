@@ -35,7 +35,7 @@ Rectangle {
         var found = false
         for (var i = 0; i < rooms.rowCount(); i++) {
             var r = rooms.roomAt(i)
-            if (r === null) continue
+            if ((r === null) || (r === undefined)) continue
 
             if (r.canonicalAlias === defaultRoom) {
                 roomListView.currentIndex = i

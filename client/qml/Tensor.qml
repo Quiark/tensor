@@ -78,6 +78,8 @@ Rectangle {
     function login(user, pass, connectFn) {
         if (!connectFn) connectFn = connection.connectToServer
 
+        connection.setHomeserver("https://matrix.org")
+
         connection.connected.connect(function() {
             settings.user = connection.userId()
             settings.token = connection.token()
@@ -105,7 +107,7 @@ Rectangle {
         })
 
         var userParts = user.split(':')
-        if(userParts.length === 1 || userParts[1] === "matrix.org") {
+        if (userParts.length === 1 || userParts[1] === "matrix.org") {
             connectFn(user, pass, settings.deviceId)
         } else {
             connection.resolved.connect(function() {

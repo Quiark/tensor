@@ -8,7 +8,7 @@ Item {
 
     function login(pretend) {
         label.text = qsTr("Please wait...")
-        if(!pretend) window.login(userNameField.text, passwordField.text)
+        if (!pretend) window.login(userNameField.text, passwordField.text)
         userNameField.enabled = false
         passwordField.enabled = false
         userNameField.opacity = 0

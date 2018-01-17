@@ -53,12 +53,12 @@ void MessageEventModel::changeRoom(QMatrixClient::Room* room)
     {
         using namespace QMatrixClient;
         connect( room, &Room::aboutToAddNewMessages,
-				[=](const RoomEvents& events)
+                [=](const RoomEventsRange& events)
                 {
                     beginInsertRows(QModelIndex(), 0, events.size() - 1);
                 });
         connect( room, &Room::aboutToAddHistoricalMessages,
-				[=](const RoomEvents& events)
+                [=](const RoomEventsRange& events)
                 {
                     beginInsertRows(QModelIndex(),
                                     rowCount(), rowCount() + events.size() - 1);

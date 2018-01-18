@@ -8,18 +8,22 @@ Item {
 
     function login(pretend) {
         label.text = qsTr("Please wait...")
-        if (!pretend) window.login(userNameField.text, passwordField.text)
+        if (!pretend) window.login(userNameField.text, passwordField.text, null, homeserverField.text)
         userNameField.enabled = false
         passwordField.enabled = false
+        homeserverField.enabled = false
         userNameField.opacity = 0
         passwordField.opacity = 0
+        homeserverField.opacity = 0
     }
 
     function restore(msg) {
         userNameField.enabled = true
         passwordField.enabled = true
+        homeserverField.enabled = true
         userNameField.opacity = 1
         passwordField.opacity = 1
+        homeserverField.opacity = 1
         logoAnimation.start()
         thisLogin.visible = true
         label.text = qsTr(msg)
@@ -74,6 +78,12 @@ Item {
             id: userNameField
             width: parent.width
             placeholderText: qsTr("Username")
+        }
+
+        TextField {
+            id: homeserverField
+            width: parent.width
+            text: "https://matrix.org"
         }
 
         TextField {

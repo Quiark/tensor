@@ -30,11 +30,13 @@ Rectangle {
         id: connection
         property string stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json")
     }
+
     Settings   {
         id: settings
 
         property string user: ""
         property string token: ""
+        property string homeserver: ""
 
         property alias winWidth: window.width
         property alias winHeight: window.height
@@ -75,14 +77,15 @@ Rectangle {
         connection.connectWithToken(connection.userId(), connection.token(), connection.deviceId())
     }
 
-    function login(user, pass, connectFn) {
+    function login(user, pass, connectFn, homeserver) {
         if (!connectFn) connectFn = connection.connectToServer
 
-        connection.setHomeserver("https://matrix.org")
+        connection.setHomeserver(homeserver)
 
         connection.connected.connect(function() {
             settings.user = connection.userId()
             settings.token = connection.token()
+            settings.homeserver = homeserver
             var deviceId = connection.deviceId()
             if (deviceId !== undefined) settings.deviceId = deviceId
             roomView.displayStatus("connected")
@@ -168,9 +171,10 @@ Rectangle {
         Component.onCompleted: {
             var user = settings.user
             var token = settings.token
+            var homeserver = settings.homeserver
             if (user && token) {
                 login.login(true)
-                window.login(user, token, connection.connectWithToken)
+                window.login(user, token, connection.connectWithToken, homeserver)
             }
         }
     }

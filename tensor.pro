@@ -35,3 +35,29 @@ DISTFILES += \
     notes.md
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+# qtdeploy config
+win32 {
+        DEPLOY_COMMAND = windeployqt
+        TARGET_EXT = .exe
+}
+macx {
+        DEPLOY_COMMAND = macdeployqt
+        TARGET_EXT = .app
+}
+
+# was:
+# debug, debug|release
+CONFIG( release ) {
+    # debug
+    #DEPLOY_TARGET = $$shell_quote($$shell_path($${OUT_PWD}/debug/$${TARGET}$${TARGET_EXT}))
+#} else {
+    # release
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${OUT_PWD}/release/$${TARGET}$${TARGET_EXT}))
+}
+
+#  # Uncomment the following line to help debug the deploy command when running qmake
+#  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
+
+# Use += instead of = if you use multiple QMAKE_POST_LINKs
+QMAKE_POST_LINK = $${DEPLOY_COMMAND} --qmldir $$PWD/client/qml $${DEPLOY_TARGET}

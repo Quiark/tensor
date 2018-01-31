@@ -74,7 +74,7 @@ Rectangle {
     }
 
     function reconnect() {
-        connection.connectWithToken(connection.userId(), connection.token(), connection.deviceId())
+        connection.connectWithToken(connection.localUserId, connection.accessToken, connection.deviceId)
     }
 
     function login(user, pass, connectFn, homeserver) {
@@ -83,10 +83,10 @@ Rectangle {
         connection.setHomeserver(homeserver)
 
         connection.connected.connect(function() {
-            settings.user = connection.userId()
-            settings.token = connection.token()
+            settings.user = connection.localUserId
+            settings.token = connection.accessToken
             settings.homeserver = homeserver
-            var deviceId = connection.deviceId()
+            var deviceId = connection.deviceId
             if (deviceId !== undefined) settings.deviceId = deviceId
             roomView.displayStatus("connected")
 

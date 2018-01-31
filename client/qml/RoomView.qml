@@ -32,7 +32,7 @@ Item {
 
     function onKeyPressed(event, isBackTab) {
         if ((event.key === Qt.Key_Tab) || (event.key === Qt.Key_Backtab)) {
-            if (completion === null) completion = new JsChat.NameCompletion(currentRoom.memberNames(), textEntry.text);
+            if (completion === null) completion = new JsChat.NameCompletion(currentRoom.memberNames, textEntry.text);
             event.accepted = true;
             textEntry.text = completion.complete(event.key === Qt.Key_Tab);
 

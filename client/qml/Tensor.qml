@@ -147,6 +147,7 @@ Rectangle {
                     enterRoom.connect(roomView.setRoom)
                     joinRoom.connect(connection.joinRoom)
                     leaveRoom.connect(connection.leaveRoom)
+                    forgetRoom.connect(connection.forgetRoom)
                     roomListComplete = true
                     componentsComplete();
                 }

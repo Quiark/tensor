@@ -29,6 +29,7 @@
 #include "lib/events/roommessageevent.h"
 #include "lib/events/roommemberevent.h"
 #include "lib/events/simplestateevents.h"
+#include "lib/events/redactionevent.h"
 
 MessageEventModel::MessageEventModel(QObject* parent)
     : QAbstractListModel(parent)
@@ -97,41 +98,70 @@ int MessageEventModel::rowCount(const QModelIndex& parent) const
 
 QVariant MessageEventModel::data(const QModelIndex& index, int role) const
 {
+    using namespace QMatrixClient;
     if( !m_currentRoom ||
 			index.row() < 0 || index.row() >= m_currentRoom->messageEvents().size() )
         return QVariant();
 
-	QMatrixClient::RoomEvent *event = (m_currentRoom->messageEvents().end() - index.row() - 1)->event();
+    RoomEvent *event = (m_currentRoom->messageEvents().end() - index.row() - 1)->event();
 
     if( role == Qt::DisplayRole )
     {
-        if( event->type() == QMatrixClient::EventType::RoomMessage )
+        if (event->isRedacted())
         {
-            QMatrixClient::RoomMessageEvent* e = static_cast<QMatrixClient::RoomMessageEvent*>(event);
-            QMatrixClient::User* user = m_connection->user(e->senderId());
+            auto reason = event->redactedBecause()->reason();
+            if (reason.isEmpty())
+                return tr("Redacted");
+            else
+                return tr("Redacted: %1")
+                    .arg(event->redactedBecause()->reason());
+        }
+
+        if( event->type() == EventType::RoomMessage )
+        {
+            using namespace MessageEventContent;
+
+            auto* e = static_cast<const RoomMessageEvent*>(event);
+            if (e->hasTextContent() && e->mimeType().name() != "text/plain")
+                return static_cast<const TextContent*>(e->content())->body;
+            if (e->hasFileContent())
+            {
+                auto fileCaption = e->content()->fileInfo()->originalName;
+                if (fileCaption.isEmpty())
+                    fileCaption = m_currentRoom->prettyPrint(e->plainBody());
+                if (fileCaption.isEmpty())
+                    return tr("a file");
+            }
+            //return m_currentRoom->prettyPrint(e->plainBody());
+
+            User* user = m_connection->user(e->senderId());
 			return QString("%1 (%2): %3").arg(user->displayname()).arg(user->id()).arg(e->plainBody());
         }
-        if( event->type() == QMatrixClient::EventType::RoomMember )
+        if( event->type() == EventType::RoomMember )
         {
-            QMatrixClient::RoomMemberEvent* e = static_cast<QMatrixClient::RoomMemberEvent*>(event);
+            RoomMemberEvent* e = static_cast<RoomMemberEvent*>(event);
             switch( e->membership() )
             {
-                case QMatrixClient::MembershipType::Join:
+                case MembershipType::Join:
                     return QString("%1 (%2) joined the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Leave:
+                case MembershipType::Leave:
                     return QString("%1 (%2) left the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Ban:
+                case MembershipType::Ban:
                     return QString("%1 (%2) was banned from the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Invite:
+                case MembershipType::Invite:
                     return QString("%1 (%2) was invited to the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Knock:
+                case MembershipType::Knock:
                     return QString("%1 (%2) knocked").arg(e->displayName(), e->userId());
             }
         }
-        if( event->type() == QMatrixClient::EventType::RoomAliases )
+        if( event->type() == EventType::RoomAliases )
         {
-            QMatrixClient::RoomAliasesEvent* e = static_cast<QMatrixClient::RoomAliasesEvent*>(event);
+            RoomAliasesEvent* e = static_cast<RoomAliasesEvent*>(event);
             return QString("Current aliases: %1").arg(e->aliases().join(", "));
+        }
+        if( event->type() == EventType::RoomEncryption )
+        {
+            return tr("activated End-to-End Encryption");
         }
         return "Unknown Event";
     }
@@ -143,11 +173,11 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
 
     if( role == EventTypeRole )
     {
-        if( event->type() == QMatrixClient::EventType::RoomMessage ) {
-            QMatrixClient::RoomMessageEvent* re = static_cast<QMatrixClient::RoomMessageEvent*>(event);
-            if (re->msgtype() == QMatrixClient::RoomMessageEvent::MsgType::Emote) {
+        if( event->type() == EventType::RoomMessage ) {
+            RoomMessageEvent* re = static_cast<RoomMessageEvent*>(event);
+            if (re->msgtype() == RoomMessageEvent::MsgType::Emote) {
                 return "message.emote";
-            } else if (re->msgtype() == QMatrixClient::RoomMessageEvent::MsgType::Notice) {
+            } else if (re->msgtype() == RoomMessageEvent::MsgType::Notice) {
                 return "message.notice";
             } else {
                 return "message";
@@ -168,10 +198,10 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
 
     if( role == AuthorRole )
     {
-        if( event->type() == QMatrixClient::EventType::RoomMessage )
+        if( event->type() == EventType::RoomMessage )
         {
-            QMatrixClient::RoomMessageEvent* e = static_cast<QMatrixClient::RoomMessageEvent*>(event);
-            QMatrixClient::User *user = m_connection->user(e->senderId());
+            RoomMessageEvent* e = static_cast<RoomMessageEvent*>(event);
+            User *user = m_connection->user(e->senderId());
             return user->displayname();
         }
         return QVariant();
@@ -179,44 +209,57 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
 
     if( role == ContentRole )
     {
-        if( event->type() == QMatrixClient::EventType::RoomMessage )
+        if( event->type() == EventType::RoomMessage )
         {
-            QMatrixClient::RoomMessageEvent* e = static_cast<QMatrixClient::RoomMessageEvent*>(event);
-            QString body = e->plainBody();
-            body.replace("<", "&lt;").replace(">", "&gt;");
+            using namespace MessageEventContent;
 
-            QRegularExpression reLinks("(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?!&//=]*))");
-			body.replace(reLinks, "<a href=\"\\1\">\\1</a>");
+            auto* e = static_cast<const RoomMessageEvent*>(event);
+            switch (e->msgtype())
+            {
+                case MessageEventType::Image:
+                case MessageEventType::File:
+                case MessageEventType::Audio:
+                case MessageEventType::Video:
+                    return QVariant::fromValue(e->content()->originalJson);
+                default:
+                {
+                    QString body = e->plainBody();
+                    body.replace("<", "&lt;").replace(">", "&gt;");
 
-			return body;
+                    QRegularExpression reLinks("(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?!&//=]*))");
+                    body.replace(reLinks, "<a href=\"\\1\">\\1</a>");
+
+                    return body;
+                }
+            }
         }
-        if( event->type() == QMatrixClient::EventType::RoomMember )
+        if( event->type() == EventType::RoomMember )
         {
-            QMatrixClient::RoomMemberEvent* e = static_cast<QMatrixClient::RoomMemberEvent*>(event);
+            RoomMemberEvent* e = static_cast<RoomMemberEvent*>(event);
             switch( e->membership() )
             {
-                case QMatrixClient::MembershipType::Join:
+                case MembershipType::Join:
                     return QString("%1 (%2) joined the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Leave:
+                case MembershipType::Leave:
                     return QString("%1 (%2) left the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Ban:
+                case MembershipType::Ban:
                     return QString("%1 (%2) was banned from the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Invite:
+                case MembershipType::Invite:
                     return QString("%1 (%2) was invited to the room").arg(e->displayName(), e->userId());
-                case QMatrixClient::MembershipType::Knock:
+                case MembershipType::Knock:
                     return QString("%1 (%2) knocked").arg(e->displayName(), e->userId());
             }
         }
-        if( event->type() == QMatrixClient::EventType::RoomAliases )
+        if( event->type() == EventType::RoomAliases )
         {
-            QMatrixClient::RoomAliasesEvent* e = static_cast<QMatrixClient::RoomAliasesEvent*>(event);
+            RoomAliasesEvent* e = static_cast<RoomAliasesEvent*>(event);
             return QString("Current aliases: %1").arg(e->aliases().join(", "));
         }
         return "Unknown Event";
     }
-//     if( event->type() == QMatrixClient::EventType::Unknown )
+//     if( event->type() == EventType::Unknown )
 //     {
-//         QMatrixClient::UnknownEvent* e = static_cast<QMatrixClient::UnknownEvent*>(event);
+//         UnknownEvent* e = static_cast<UnknownEvent*>(event);
 //         return "Unknown Event: " + e->typeString() + "(" + e->content();
 //     }
     return QVariant();

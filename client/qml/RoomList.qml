@@ -11,6 +11,7 @@ Rectangle {
     signal enterRoom(var room)
     signal joinRoom(string name)
     signal leaveRoom(var room)
+    signal forgetRoom(var room)
 
     property bool initialised: false
 
@@ -123,7 +124,7 @@ Rectangle {
                     onTriggered: {
                         var roomToLeave = currentRoom()
                         changeRoom(+1)
-                        leaveRoom(roomToLeave)
+                        forgetRoom(roomToLeave.id)
                     }
                 }
             }

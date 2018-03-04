@@ -46,7 +46,6 @@ class RoomListModel: public QAbstractListModel
         void namesChanged(QMatrixClient::Room* room);
         void unreadMessagesChanged(QMatrixClient::Room* room);
         void connectRoomSignals(QMatrixClient::Room* room);
-        void removeRoom(QMatrixClient::Room* room);
         void highlightCountChanged(QMatrixClient::Room* room);
 
     private:

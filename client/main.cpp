@@ -42,6 +42,7 @@ int main(int argc, char* argv[]) {
     qmlRegisterType<SyncJob>(); qRegisterMetaType<SyncJob*> ("SyncJob*");
     qmlRegisterType<JoinRoomJob>(); 	qRegisterMetaType<JoinRoomJob*> ("JoinRoomJob*");
     qmlRegisterType<LeaveRoomJob>(); 	qRegisterMetaType<LeaveRoomJob*> ("LeaveRoomJob*");
+    qmlRegisterType<ForgetRoomJob>(); 	qRegisterMetaType<ForgetRoomJob*> ("ForgetRoomJob*");
     qmlRegisterType<Room>();    qRegisterMetaType<Room*>    ("Room*");
     qmlRegisterType<User>();    qRegisterMetaType<User*>    ("User*");
 

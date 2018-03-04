@@ -67,16 +67,6 @@ QMatrixClient::Room* RoomListModel::roomAt(int row)
     return m_rooms.at(row);
 }
 
-void RoomListModel::removeRoom(QMatrixClient::Room* room)
-{
-    int ix = m_rooms.indexOf(room);
-    if (ix == -1) return;
-
-    beginRemoveRows(QModelIndex(), ix, ix);
-    m_rooms.removeAt(ix);
-    endRemoveRows();
-}
-
 void RoomListModel::connectRoomSignals(QMatrixClient::Room* room)
 {
     connect( room, &QMatrixClient::Room::namesChanged, this, &RoomListModel::namesChanged );

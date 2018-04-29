@@ -89,12 +89,13 @@ Rectangle {
                 horizontalAlignment: Text.AlignRight
             }
             Label {
+                property bool contentIsText: typeof content === 'string'
                 id: contentlabel
-                text: content
+                text: contentIsText ? content : "***"
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventType.startsWith(
-                           "message") ? Theme.chatFg : "lightgrey"
+                color: eventType.startsWith("message")
+                       && contentIsText ? Theme.chatFg : "lightgrey"
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont

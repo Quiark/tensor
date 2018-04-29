@@ -11,6 +11,7 @@
 #include "jobs/generated/leaving.h"
 #include "models/messageeventmodel.h"
 #include "models/roomlistmodel.h"
+#include "imageprovider.h"
 #include "settings.h"
 using namespace QMatrixClient;
 
@@ -38,6 +39,10 @@ int main(int argc, char* argv[]) {
     }
     view.connect(view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
     new QQmlFileSelector(view.engine(), &view);
+    QScopedPointer<ImageProvider> m_imageProvider(new ImageProvider(nullptr)); // No connection yet
+    view.rootContext()->setContextProperty(QLatin1String("mtxImageProvider"), m_imageProvider.data());
+    view.engine()->addImageProvider(QLatin1String("mtx"), m_imageProvider.data());
+
 
     qmlRegisterType<SyncJob>(); qRegisterMetaType<SyncJob*> ("SyncJob*");
     qmlRegisterType<JoinRoomJob>(); 	qRegisterMetaType<JoinRoomJob*> ("JoinRoomJob*");

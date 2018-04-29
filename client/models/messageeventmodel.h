@@ -38,6 +38,7 @@ class MessageEventModel: public QAbstractListModel
             TimeRole,
             DateRole,
             AuthorRole,
+            AuthorAvatarRole,
             ContentRole
         };
 

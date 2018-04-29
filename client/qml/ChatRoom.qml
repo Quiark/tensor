@@ -68,6 +68,23 @@ Rectangle {
                 width: 80
                 horizontalAlignment: Text.AlignRight
             }
+            Item {
+                id: authorIcon
+                width: height
+                height: timelabel.height
+                Rectangle {
+                    anchors.fill: parent
+                    color: authorlabel.color
+                    visible: !authorIconImage.status
+                }
+                Image {
+                    id: authorIconImage
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    source: avatar ? "image://mtx/" + avatar : ""
+                }
+            }
+
             Label {
                 id: authorlabel
                 width: 140
@@ -89,19 +106,31 @@ Rectangle {
                 horizontalAlignment: Text.AlignRight
             }
             Label {
+                visible: eventType.startsWith("message")
                 property bool contentIsText: typeof content === 'string'
                 id: contentlabel
                 text: contentIsText ? content : "***"
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventType.startsWith("message")
-                       && contentIsText ? Theme.chatFg : "lightgrey"
+                color: contentIsText ? Theme.chatFg : "lightgrey"
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont
                 font.pointSize: Theme.textSize
                 font.italic: eventType == "message.emote" ? true : false
                 onLinkActivated: Qt.openUrlExternally(link)
+            }
+
+            Item {
+                id: imageItem
+                width: 320
+                height: 240
+                visible: eventType === "image" ? true : false
+                Image {
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    source: visible ? "image://mtx/" + content : ""
+                }
             }
         }
 

@@ -30,6 +30,9 @@ Rectangle {
         id: connection
         property string stateSaveFile: (StandardPaths.writableLocation(
                                             StandardPaths.AppDataLocation) + "/state.json")
+        Component.onCompleted: {
+            mtxImageProvider.setConnection(connection)
+        }
     }
 
     Settings {

@@ -21,7 +21,7 @@ Rectangle {
         onDataChanged: {
             // may have received a message but if focused, mark as read
             var room = currentRoom()
-            if (room != null)
+            if (room !== null)
                 room.markAllMessagesAsRead()
         }
     }

@@ -8,7 +8,9 @@ Item {
 
     function login(pretend) {
         label.text = qsTr("Please wait...")
-        if (!pretend) window.login(userNameField.text, passwordField.text, null, homeserverField.text)
+        if (!pretend)
+            window.login(userNameField.text, passwordField.text, null,
+                         homeserverField.text)
         userNameField.enabled = false
         passwordField.enabled = false
         homeserverField.enabled = false
@@ -65,11 +67,14 @@ Item {
             }
         }
 
-        Label { id: phantomLabel; visible: false }
+        Label {
+            id: phantomLabel
+            visible: false
+        }
 
         Label {
             id: label
-            font.pixelSize: phantomLabel.font.pixelSize * 5/2
+            font.pixelSize: phantomLabel.font.pixelSize * 5 / 2
             text: qsTr("Tensor")
             color: "#888"
         }

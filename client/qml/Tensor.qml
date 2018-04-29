@@ -16,7 +16,7 @@ Rectangle {
     property int syncIx: 0
     property var lastSync
     property bool roomListComplete: false
-    signal componentsComplete();
+    signal componentsComplete
 
     Timer {
         id: synctimer
@@ -28,10 +28,11 @@ Rectangle {
 
     Connection {
         id: connection
-        property string stateSaveFile: (StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/state.json")
+        property string stateSaveFile: (StandardPaths.writableLocation(
+                                            StandardPaths.AppDataLocation) + "/state.json")
     }
 
-    Settings   {
+    Settings {
         id: settings
 
         property string user: ""
@@ -59,53 +60,64 @@ Rectangle {
         var now = new Date()
         var delay = (now - lastSync) / 1000
         //console.log("..> synced in ", delay, " s <..")
-        roomView.displayStatus("synced (in "+ delay +"s)")
+        roomView.displayStatus("synced (in " + delay + "s)")
         synctimer.interval = settings.minResyncMs - (delay * 1000)
-        if (!(synctimer.interval > 0)) { // this expression also takes care of NaN
+        if (!(synctimer.interval > 0)) {
+            // this expression also takes care of NaN
             synctimer.interval = 0
         }
-        //console.log("resync in .. ", synctimer.interval, " ms")
 
+        //console.log("resync in .. ", synctimer.interval, " ms")
         synctimer.start()
         lastSync = now
 
         // every now and then but not on the first sync
-        if ((syncIx % 30) == 2) connection.saveState(connection.stateSaveFile)
+        if ((syncIx % 30) == 2)
+            connection.saveState(connection.stateSaveFile)
     }
 
     function reconnect() {
-        connection.connectWithToken(connection.localUserId, connection.accessToken, connection.deviceId)
+        connection.connectWithToken(connection.localUserId,
+                                    connection.accessToken, connection.deviceId)
     }
 
     function login(user, pass, connectFn, homeserver) {
-        if (!connectFn) connectFn = connection.connectToServer
+        if (!connectFn)
+            connectFn = connection.connectToServer
 
         connection.setHomeserver(homeserver)
 
-        connection.connected.connect(function() {
+        connection.connected.connect(function () {
             settings.user = connection.localUserId
             settings.token = connection.accessToken
             settings.homeserver = homeserver
             var deviceId = connection.deviceId
-            if (deviceId !== undefined) settings.deviceId = deviceId
+            if (deviceId !== undefined)
+                settings.deviceId = deviceId
             roomView.displayStatus("connected")
 
             connection.syncError.connect(reconnect)
-            connection.syncError.connect(function() { roomView.displayStatus("sync error")})
+            connection.syncError.connect(function () {
+                roomView.displayStatus("sync error")
+            })
             connection.resolveError.connect(reconnect)
-            connection.resolveError.connect(function() { roomView.displayStatus("resolve error")})
+            connection.resolveError.connect(function () {
+                roomView.displayStatus("resolve error")
+            })
             connection.syncDone.connect(resync)
             connection.reconnected.connect(resync)
 
-            var startSyncFn = function() {
+            var startSyncFn = function () {
                 connection.loadState(connection.stateSaveFile)
                 connection.sync()
             }
-            if (roomListComplete) startSyncFn()
-            else componentsComplete.connect(startSyncFn)
+            if (roomListComplete)
+                startSyncFn()
+            else
+                componentsComplete.connect(startSyncFn)
         })
 
-        connection.loginError.connect(function() {
+        connection.loginError.connect(function () {
             login.restore("Login invalid")
         })
 
@@ -113,16 +125,15 @@ Rectangle {
         if (userParts.length === 1 || userParts[1] === "matrix.org") {
             connectFn(user, pass, settings.deviceId)
         } else {
-            connection.resolved.connect(function() {
+            connection.resolved.connect(function () {
                 connectFn(user, pass, settings.deviceId)
             })
-            connection.resolveError.connect(function() {
+            connection.resolveError.connect(function () {
                 console.log("Couldn't resolve server!")
             })
             connection.resolveServer(userParts[1])
         }
     }
-
 
     Item {
         id: mainView
@@ -149,13 +160,13 @@ Rectangle {
                     leaveRoom.connect(connection.leaveRoom)
                     forgetRoom.connect(connection.forgetRoom)
                     roomListComplete = true
-                    componentsComplete();
+                    componentsComplete()
                 }
             }
 
             RoomView {
                 id: roomView
-                width: parent.width * 4/5
+                width: parent.width * 4 / 5
                 height: parent.height
                 Component.onCompleted: {
                     setConnection(connection)
@@ -175,7 +186,8 @@ Rectangle {
             var homeserver = settings.homeserver
             if (user && token) {
                 login.login(true)
-                window.login(user, token, connection.connectWithToken, homeserver)
+                window.login(user, token, connection.connectWithToken,
+                             homeserver)
             }
         }
     }

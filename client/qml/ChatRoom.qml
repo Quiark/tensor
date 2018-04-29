@@ -2,7 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.1
 import Matrix 1.0
 import Tensor 1.0
-import 'jschat.js' as JsChat
+import "jschat.js" as JsChat
 
 Rectangle {
     id: root
@@ -11,7 +11,6 @@ Rectangle {
     property Connection currentConnection: null
     property var currentRoom: null
     property string status: ""
-
 
     function setRoom(room) {
         currentRoom = room
@@ -26,8 +25,10 @@ Rectangle {
     }
 
     function sendLine(text) {
-        if (!currentRoom || !currentConnection) return
-        if (text.trim().length === 0) return
+        if (!currentRoom || !currentConnection)
+            return
+        if (text.trim().length === 0)
+            return
 
         var type = "m.text"
         var PREFIX_ME = '/me '
@@ -40,16 +41,20 @@ Rectangle {
     }
 
     function scrollPage(amount) {
-        scrollBar.position = Math.max(0, Math.min(1 - scrollBar.size, scrollBar.position + amount * scrollBar.stepSize));
+        scrollBar.position = Math.max(
+                    0,
+                    Math.min(1 - scrollBar.size,
+                             scrollBar.position + amount * scrollBar.stepSize))
     }
-
 
     ListView {
         id: chatView
         anchors.fill: parent
         flickableDirection: Flickable.VerticalFlick
         verticalLayoutDirection: ListView.BottomToTop
-        model: MessageEventModel { id: messageModel }
+        model: MessageEventModel {
+            id: messageModel
+        }
 
         delegate: Row {
             id: message
@@ -70,14 +75,17 @@ Rectangle {
                 text: {
                     if (eventType.startsWith("message")) {
                         if (eventType == "message.emote")
-                            return "* " + author;
+                            return "* " + author
                         else
-                            return author;
-                    } else return "***"
+                            return author
+                    } else
+                        return "***"
                 }
                 font.family: Theme.nickFont
                 font.italic: eventType == "message.emote" ? true : false
-                color: eventType.startsWith("message") ? JsChat.NickColoring.get(author): "lightgrey"
+                color: eventType.startsWith(
+                           "message") ? JsChat.NickColoring.get(
+                                            author) : "lightgrey"
                 horizontalAlignment: Text.AlignRight
             }
             Label {
@@ -85,7 +93,8 @@ Rectangle {
                 text: content
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventType.startsWith("message") ? Theme.chatFg : "lightgrey"
+                color: eventType.startsWith(
+                           "message") ? Theme.chatFg : "lightgrey"
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont
@@ -112,7 +121,8 @@ Rectangle {
         }
 
         onAtYBeginningChanged: {
-            if(currentRoom && atYBeginning) currentRoom.getPreviousContent(50)
+            if (currentRoom && atYBeginning)
+                currentRoom.getPreviousContent(50)
         }
 
         ScrollBar.vertical: ScrollBar {

@@ -106,7 +106,7 @@ Rectangle {
                 horizontalAlignment: Text.AlignRight
             }
             Label {
-                visible: eventType.startsWith("message")
+                visible: !imageItem.visible
                 property bool contentIsText: typeof content === 'string'
                 id: contentlabel
                 text: contentIsText ? content : "***"

@@ -22,14 +22,14 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QDebug>
 
-#include "lib/connection.h"
-#include "lib/room.h"
-#include "lib/user.h"
-#include "lib/events/event.h"
-#include "lib/events/roommessageevent.h"
-#include "lib/events/roommemberevent.h"
-#include "lib/events/simplestateevents.h"
-#include "lib/events/redactionevent.h"
+#include "connection.h"
+#include "room.h"
+#include "user.h"
+#include "events/event.h"
+#include "events/roommessageevent.h"
+#include "events/roommemberevent.h"
+#include "events/simplestateevents.h"
+#include "events/redactionevent.h"
 
 MessageEventModel::MessageEventModel(QObject* parent)
     : QAbstractListModel(parent)
@@ -173,8 +173,14 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
 
     if( role == EventTypeRole )
     {
+        if (event->isStateEvent())
+                    return "state";
         if( event->type() == EventType::RoomMessage ) {
             RoomMessageEvent* re = static_cast<RoomMessageEvent*>(event);
+            using namespace MessageEventContent;
+            if (re->msgtype()==MessageEventType::Image) {
+                return "image";
+            }
             if (re->msgtype() == RoomMessageEvent::MsgType::Emote) {
                 return "message.emote";
             } else if (re->msgtype() == RoomMessageEvent::MsgType::Notice) {
@@ -182,7 +188,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
             } else {
                 return "message";
             }
-        }
+        }   
         return "other";
     }
 
@@ -207,6 +213,17 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
+    if( role == AuthorAvatarRole )
+    {
+        if( event->type() == EventType::RoomMessage )
+        {
+            RoomMessageEvent* e = static_cast<RoomMessageEvent*>(event);
+            User *user = m_connection->user(e->senderId());
+            return user->avatarMediaId();
+        }
+        return QVariant();
+    }
+
     if( role == ContentRole )
     {
         if( event->type() == EventType::RoomMessage )
@@ -217,12 +234,12 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
             switch (e->msgtype())
             {
                 case MessageEventType::Image:
+                    return e->content()->fileInfo()->mediaId();
                 case MessageEventType::File:
                 case MessageEventType::Audio:
                 case MessageEventType::Video:
                     return QVariant::fromValue(e->content()->originalJson);
                 default:
-                {
                     QString body = e->plainBody();
                     body.replace("<", "&lt;").replace(">", "&gt;");
 
@@ -230,7 +247,6 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
                     body.replace(reLinks, "<a href=\"\\1\">\\1</a>");
 
                     return body;
-                }
             }
         }
         if( event->type() == EventType::RoomMember )
@@ -272,6 +288,7 @@ QHash<int, QByteArray> MessageEventModel::roleNames() const
     roles[TimeRole] = "time";
     roles[DateRole] = "date";
     roles[AuthorRole] = "author";
+    roles[AuthorAvatarRole] = "avatar";
     roles[ContentRole] = "content";
     return roles;
 }

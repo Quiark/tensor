@@ -2,7 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.1
 import Matrix 1.0
 import Tensor 1.0
-import 'jschat.js' as JsChat
+import "jschat.js" as JsChat
 
 Rectangle {
     id: root
@@ -11,7 +11,6 @@ Rectangle {
     property Connection currentConnection: null
     property var currentRoom: null
     property string status: ""
-
 
     function setRoom(room) {
         currentRoom = room
@@ -26,8 +25,10 @@ Rectangle {
     }
 
     function sendLine(text) {
-        if (!currentRoom || !currentConnection) return
-        if (text.trim().length === 0) return
+        if (!currentRoom || !currentConnection)
+            return
+        if (text.trim().length === 0)
+            return
 
         var type = "m.text"
         var PREFIX_ME = '/me '
@@ -40,16 +41,20 @@ Rectangle {
     }
 
     function scrollPage(amount) {
-        scrollBar.position = Math.max(0, Math.min(1 - scrollBar.size, scrollBar.position + amount * scrollBar.stepSize));
+        scrollBar.position = Math.max(
+                    0,
+                    Math.min(1 - scrollBar.size,
+                             scrollBar.position + amount * scrollBar.stepSize))
     }
-
 
     ListView {
         id: chatView
         anchors.fill: parent
         flickableDirection: Flickable.VerticalFlick
         verticalLayoutDirection: ListView.BottomToTop
-        model: MessageEventModel { id: messageModel }
+        model: MessageEventModel {
+            id: messageModel
+        }
 
         delegate: Row {
             id: message
@@ -63,6 +68,23 @@ Rectangle {
                 width: 80
                 horizontalAlignment: Text.AlignRight
             }
+            Item {
+                id: authorIcon
+                width: height
+                height: timelabel.height
+                Rectangle {
+                    anchors.fill: parent
+                    color: authorlabel.color
+                    visible: !authorIconImage.status
+                }
+                Image {
+                    id: authorIconImage
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    source: avatar ? "image://mtx/" + avatar : ""
+                }
+            }
+
             Label {
                 id: authorlabel
                 width: 140
@@ -70,28 +92,45 @@ Rectangle {
                 text: {
                     if (eventType.startsWith("message")) {
                         if (eventType == "message.emote")
-                            return "* " + author;
+                            return "* " + author
                         else
-                            return author;
-                    } else return "***"
+                            return author
+                    } else
+                        return "***"
                 }
                 font.family: Theme.nickFont
                 font.italic: eventType == "message.emote" ? true : false
-                color: eventType.startsWith("message") ? JsChat.NickColoring.get(author): "lightgrey"
+                color: eventType.startsWith(
+                           "message") ? JsChat.NickColoring.get(
+                                            author) : "lightgrey"
                 horizontalAlignment: Text.AlignRight
             }
             Label {
+                visible: !imageItem.visible
+                property bool contentIsText: typeof content === 'string'
                 id: contentlabel
-                text: content
+                text: contentIsText ? content : "***"
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventType.startsWith("message") ? Theme.chatFg : "lightgrey"
+                color: contentIsText ? Theme.chatFg : "lightgrey"
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont
                 font.pointSize: Theme.textSize
                 font.italic: eventType == "message.emote" ? true : false
                 onLinkActivated: Qt.openUrlExternally(link)
+            }
+
+            Item {
+                id: imageItem
+                width: 320
+                height: 240
+                visible: eventType === "image" ? true : false
+                Image {
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    source: visible ? "image://mtx/" + content : ""
+                }
             }
         }
 
@@ -112,7 +151,8 @@ Rectangle {
         }
 
         onAtYBeginningChanged: {
-            if(currentRoom && atYBeginning) currentRoom.getPreviousContent(50)
+            if (currentRoom && atYBeginning)
+                currentRoom.getPreviousContent(50)
         }
 
         ScrollBar.vertical: ScrollBar {

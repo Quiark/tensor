@@ -3,7 +3,7 @@ import QtQuick.Controls 1.0
 import QtQuick.Controls.Styles 1.4
 import Matrix 1.0
 import Tensor 1.0
-import 'jschat.js' as JsChat
+import "jschat.js" as JsChat
 
 Rectangle {
     color: Theme.roomListBg
@@ -21,8 +21,8 @@ Rectangle {
         onDataChanged: {
             // may have received a message but if focused, mark as read
             var room = currentRoom()
-            if (room != null) room.markAllMessagesAsRead()
-
+            if (room !== null)
+                room.markAllMessagesAsRead()
         }
     }
 
@@ -36,7 +36,8 @@ Rectangle {
         var found = false
         for (var i = 0; i < rooms.rowCount(); i++) {
             var r = rooms.roomAt(i)
-            if ((r === null) || (r === undefined)) continue
+            if ((r === null) || (r === undefined))
+                continue
 
             if (r.canonicalAlias === defaultRoom) {
                 roomListView.currentIndex = i
@@ -44,21 +45,24 @@ Rectangle {
                 found = true
             }
         }
-        if (!found) joinRoom(defaultRoom)
+        if (!found)
+            joinRoom(defaultRoom)
     }
 
     function refresh() {
-        if(roomListView.visible)
+        if (roomListView.visible)
             roomListView.forceLayout()
     }
 
     function changeRoom(dir) {
-        roomListView.currentIndex = JsChat.posmod(roomListView.currentIndex + dir, roomListView.count);
+        roomListView.currentIndex = JsChat.posmod(
+                    roomListView.currentIndex + dir, roomListView.count)
         enterRoom(rooms.roomAt(roomListView.currentIndex))
     }
 
     function currentRoom() {
-        if (roomListView.currentIndex < 0) return null
+        if (roomListView.currentIndex < 0)
+            return null
         var room = rooms.roomAt(roomListView.currentIndex)
         return room
     }
@@ -97,10 +101,10 @@ Rectangle {
                     onPressed: {
                         roomListView.currentIndex = index
                         enterRoom(rooms.roomAt(index))
-
                     }
                     onClicked: {
-                        if (mouse.button === Qt.RightButton) contextMenu.popup();
+                        if (mouse.button === Qt.RightButton)
+                            contextMenu.popup()
                     }
                 }
             }
@@ -112,10 +116,10 @@ Rectangle {
             }
             highlightMoveDuration: 0
 
-            onCountChanged: if(initialised) {
-                roomListView.currentIndex = count-1
-                enterRoom(rooms.roomAt(count-1))
-            }
+            onCountChanged: if (initialised) {
+                                roomListView.currentIndex = count - 1
+                                enterRoom(rooms.roomAt(count - 1))
+                            }
 
             Menu {
                 id: contextMenu
@@ -134,7 +138,10 @@ Rectangle {
             id: textEntry
             width: parent.width
             placeholderText: qsTr("Join room...")
-            onAccepted: { joinRoom(text); text = "" }
+            onAccepted: {
+                joinRoom(text)
+                text = ""
+            }
 
             style: TextFieldStyle {
                 font: Theme.textFont

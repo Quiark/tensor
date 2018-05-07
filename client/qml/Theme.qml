@@ -19,6 +19,4 @@ Settings {
     property string highlightRoomFg: "white"
     property string normalRoomFg: "#dddddd"
     property string textInputFg: "black"
-
 }
-

@@ -61,6 +61,9 @@ Rectangle {
             width: parent.width
             spacing: 8
 
+            property bool contentIsText: typeof content === 'string'
+            property bool eventTypeIsAMessage: eventType.startsWith("message")
+
             Label {
                 id: timelabel
                 text: time.toLocaleTimeString("hh:mm:ss")
@@ -90,7 +93,7 @@ Rectangle {
                 width: 140
                 elide: Text.ElideRight
                 text: {
-                    if (eventType.startsWith("message")) {
+                    if (eventTypeIsAMessage) {
                         if (eventType == "message.emote")
                             return "* " + author
                         else
@@ -100,19 +103,17 @@ Rectangle {
                 }
                 font.family: Theme.nickFont
                 font.italic: eventType == "message.emote" ? true : false
-                color: eventType.startsWith(
-                           "message") ? JsChat.NickColoring.get(
+                color: eventTypeIsAMessage ? JsChat.NickColoring.get(
                                             author) : "lightgrey"
                 horizontalAlignment: Text.AlignRight
             }
             Label {
                 visible: !imageItem.visible
-                property bool contentIsText: typeof content === 'string'
                 id: contentlabel
                 text: contentIsText ? content : "***"
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: contentIsText ? Theme.chatFg : "lightgrey"
+                color: eventTypeIsAMessage ? Theme.chatFg : "lightgrey"
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont

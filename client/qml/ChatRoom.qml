@@ -104,7 +104,7 @@ Rectangle {
                 font.family: Theme.nickFont
                 font.italic: eventType == "message.emote" ? true : false
                 color: eventTypeIsAMessage ? JsChat.NickColoring.get(
-                                            author) : "lightgrey"
+                                            author) : Theme.nonMessageFg
                 horizontalAlignment: Text.AlignRight
             }
             Label {
@@ -113,7 +113,7 @@ Rectangle {
                 text: contentIsText ? content : "***"
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventTypeIsAMessage ? Theme.chatFg : "lightgrey"
+                color: eventTypeIsAMessage ? Theme.chatFg : Theme.nonMessageFg
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont

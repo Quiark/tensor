@@ -103,7 +103,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
 			index.row() < 0 || index.row() >= m_currentRoom->messageEvents().size() )
         return QVariant();
 
-    RoomEvent *event = (m_currentRoom->messageEvents().end() - index.row() - 1)->event();
+    auto *event = (m_currentRoom->messageEvents().end() - index.row() - 1)->event();
 
     if( role == Qt::DisplayRole )
     {
@@ -139,7 +139,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
         }
         if( event->type() == EventType::RoomMember )
         {
-            RoomMemberEvent* e = static_cast<RoomMemberEvent*>(event);
+            auto* e = static_cast<const RoomMemberEvent*>(event);
             switch( e->membership() )
             {
                 case MembershipType::Join:
@@ -156,7 +156,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
         }
         if( event->type() == EventType::RoomAliases )
         {
-            RoomAliasesEvent* e = static_cast<RoomAliasesEvent*>(event);
+            auto* e = static_cast<const RoomAliasesEvent*>(event);
             return QString("Current aliases: %1").arg(e->aliases().join(", "));
         }
         if( event->type() == EventType::RoomEncryption )
@@ -176,7 +176,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
         if (event->isStateEvent())
                     return "state";
         if( event->type() == EventType::RoomMessage ) {
-            RoomMessageEvent* re = static_cast<RoomMessageEvent*>(event);
+            auto* re = static_cast<const RoomMessageEvent*>(event);
             using namespace MessageEventContent;
             if (re->msgtype()==MessageEventType::Image) {
                 return "image";
@@ -206,7 +206,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
     {
         if( event->type() == EventType::RoomMessage )
         {
-            RoomMessageEvent* e = static_cast<RoomMessageEvent*>(event);
+            auto* e = static_cast<const RoomMessageEvent*>(event);
             User *user = m_connection->user(e->senderId());
             return user->displayname();
         }
@@ -217,7 +217,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
     {
         if( event->type() == EventType::RoomMessage )
         {
-            RoomMessageEvent* e = static_cast<RoomMessageEvent*>(event);
+            auto* e = static_cast<const RoomMessageEvent*>(event);
             User *user = m_connection->user(e->senderId());
             return user->avatarMediaId();
         }
@@ -251,7 +251,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
         }
         if( event->type() == EventType::RoomMember )
         {
-            RoomMemberEvent* e = static_cast<RoomMemberEvent*>(event);
+            auto* e = static_cast<const RoomMemberEvent*>(event);
             switch( e->membership() )
             {
                 case MembershipType::Join:
@@ -268,7 +268,7 @@ QVariant MessageEventModel::data(const QModelIndex& index, int role) const
         }
         if( event->type() == EventType::RoomAliases )
         {
-            RoomAliasesEvent* e = static_cast<RoomAliasesEvent*>(event);
+            auto* e = static_cast<const RoomAliasesEvent*>(event);
             return QString("Current aliases: %1").arg(e->aliases().join(", "));
         }
         return "Unknown Event";

@@ -30,13 +30,13 @@ Rectangle {
         if (text.trim().length === 0)
             return
 
-        var type = "m.text"
+        var type = RoomMessageEvent.Text
         var PREFIX_ME = '/me '
         if (text.startsWith(PREFIX_ME)) {
             text = text.substr(PREFIX_ME.length)
-            type = "m.emote"
+            type = RoomMessageEvent.Emote
         }
-        currentConnection.postMessage(currentRoom, type, text)
+        currentRoom.postMessage(text, type)
         chatView.positionViewAtBeginning()
     }
 

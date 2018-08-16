@@ -6,9 +6,9 @@
 #include "room.h"
 #include "user.h"
 #include "jobs/syncjob.h"
-#include "jobs/joinroomjob.h"
-#include "jobs/generated/inviting.h"
-#include "jobs/generated/leaving.h"
+#include "csapi/joining.h"
+#include "csapi/inviting.h"
+#include "csapi/leaving.h"
 #include "models/messageeventmodel.h"
 #include "models/roomlistmodel.h"
 #include "imageprovider.h"
@@ -50,11 +50,13 @@ int main(int argc, char* argv[]) {
     qmlRegisterType<ForgetRoomJob>(); 	qRegisterMetaType<ForgetRoomJob*> ("ForgetRoomJob*");
     qmlRegisterType<Room>();    qRegisterMetaType<Room*>    ("Room*");
     qmlRegisterType<User>();    qRegisterMetaType<User*>    ("User*");
+    qRegisterMetaType<MessageEventType>("MessageEventType");
 
     qmlRegisterType<Connection>        ("Matrix", 1, 0, "Connection");
     qmlRegisterType<MessageEventModel> ("Matrix", 1, 0, "MessageEventModel");
     qmlRegisterType<RoomListModel>     ("Matrix", 1, 0, "RoomListModel");
     qmlRegisterSingletonType(QUrl("qrc:/qml/Theme.qml"), "Tensor", 1, 0, "Theme");
+    qmlRegisterUncreatableType<RoomMessageEvent>("Matrix", 1, 0, "RoomMessageEvent", "ENUM");
 
     view.setSource(QUrl("qrc:/qml/Tensor.qml"));
     view.setResizeMode(QQuickView::SizeRootObjectToView);

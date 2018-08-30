@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     app.setOrganizationName("David A Roberts");
     app.setOrganizationDomain("davidar.io");
     app.setApplicationName("Tensor");
-    app.setApplicationVersion("Q0.4");
+    app.setApplicationVersion("Q0.5");
     QSettings::setDefaultFormat(QSettings::IniFormat);
 
 	// debugging
@@ -50,6 +50,7 @@ int main(int argc, char* argv[]) {
     qmlRegisterType<ForgetRoomJob>(); 	qRegisterMetaType<ForgetRoomJob*> ("ForgetRoomJob*");
     qmlRegisterType<Room>();    qRegisterMetaType<Room*>    ("Room*");
     qmlRegisterType<User>();    qRegisterMetaType<User*>    ("User*");
+    qRegisterMetaType<QuaternionRoom*>("QuaternionRoom*");
     qRegisterMetaType<MessageEventType>("MessageEventType");
 
     qmlRegisterType<Connection>        ("Matrix", 1, 0, "Connection");

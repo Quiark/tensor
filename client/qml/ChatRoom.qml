@@ -21,7 +21,6 @@ Rectangle {
 
     function setConnection(conn) {
         currentConnection = conn
-        messageModel.setConnection(conn)
     }
 
     function sendLine(text) {
@@ -61,8 +60,7 @@ Rectangle {
             width: parent.width
             spacing: 8
 
-            property bool contentIsText: typeof content === 'string'
-            property bool eventTypeIsAMessage: eventType.startsWith("message")
+            property bool contentIsText: contentType.startsWith("text/")
 
             Label {
                 id: timelabel
@@ -84,7 +82,7 @@ Rectangle {
                     id: authorIconImage
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: avatar ? "image://mtx/" + avatar : ""
+                    source: author.avatarMediaId ? "image://mtx/" + author.avatarMediaId : ""
                 }
             }
 
@@ -93,44 +91,47 @@ Rectangle {
                 width: 140
                 elide: Text.ElideRight
                 text: {
-                    if (eventTypeIsAMessage) {
-                        if (eventType == "message.emote")
-                            return "* " + author
-                        else
-                            return author
-                    } else
-                        return "***"
+                    if (eventType == "emote")
+                        return "* " + author.displayName
+                    else if (eventType == "state")
+                        return "***" //author.displayName
+                    else
+                        return author.displayName
                 }
                 font.family: Theme.nickFont
-                font.italic: eventType == "message.emote" ? true : false
-                color: eventTypeIsAMessage ? JsChat.NickColoring.get(
-                                            author) : Theme.nonMessageFg
+                font.italic: eventType == "emote" ? true : false
+                color: (eventType != "state" && eventType != "other") ? JsChat.NickColoring.get(
+                                                                        author.displayName) : Theme.nonMessageFg
                 horizontalAlignment: Text.AlignRight
             }
             Label {
                 visible: !imageItem.visible
                 id: contentlabel
-                text: contentIsText ? content : "***"
+                text: {
+                    if (eventType == "state")
+                        return author.displayName + " " + display
+                    else
+                        return display
+                }
                 wrapMode: Text.Wrap
                 width: parent.width - (x - parent.x) - spacing
-                color: eventTypeIsAMessage ? Theme.chatFg : Theme.nonMessageFg
+                color: (eventType == "message" || eventType == "emote") ? Theme.chatFg : Theme.nonMessageFg
                 linkColor: "black"
                 textFormat: Text.RichText
                 font.family: Theme.textFont
                 font.pointSize: Theme.textSize
-                font.italic: eventType == "message.emote" ? true : false
+                font.italic: eventType == "emote" ? true : false
                 onLinkActivated: Qt.openUrlExternally(link)
             }
-
             Item {
                 id: imageItem
                 width: 320
                 height: 240
-                visible: eventType === "image" ? true : false
+                visible: eventType === "image"
                 Image {
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: visible ? "image://mtx/" + content : ""
+                    source: visible ? "image://mtx/" + content.thumbnailMediaId : ""
                 }
             }
         }

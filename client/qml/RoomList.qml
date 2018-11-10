@@ -33,20 +33,12 @@ Rectangle {
     function init() {
         var defaultRoom = "#tensor:matrix.org"
         initialised = true
-        var found = false
-        for (var i = 0; i < rooms.rowCount(); i++) {
-            var r = rooms.roomAt(i)
-            if ((r === null) || (r === undefined))
-                continue
-
-            if (r.canonicalAlias === defaultRoom) {
-                roomListView.currentIndex = i
-                enterRoom(r)
-                found = true
-            }
-        }
-        if (!found)
+        if (rooms.rowCount() === 0) {
             joinRoom(defaultRoom)
+        } else {
+            roomListView.currentIndex = 0
+            enterRoom(rooms.roomAt(roomListView.currentIndex))
+        }
     }
 
     function refresh() {
